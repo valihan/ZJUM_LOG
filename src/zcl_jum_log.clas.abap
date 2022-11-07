@@ -17,7 +17,7 @@ public section.
   class-methods GET_INSTANCE
     importing
       !IV_OBJECT type BALOBJ_D
-      !IV_SUBOBJECT type BALSUBOBJ
+      !IV_SUBOBJECT type BALSUBOBJ default ZIF_JUM_LOG_CONST=>GC_S_LOG-NONE
       !IV_EXTNUMBER type BALNREXT optional
       !IS_OPTIONS type ZIF_JUM_LOG=>TS_OPTIONS optional
     returning
@@ -81,18 +81,54 @@ CLASS ZCL_JUM_LOG IMPLEMENTATION.
 *PARAMS
     ).
 
-    CALL FUNCTION 'BAL_LOG_CREATE'
-      EXPORTING
-        i_s_log                 = ls_ballog
-      IMPORTING
-        e_log_handle            = mv_log_handle
-      EXCEPTIONS
-        log_header_inconsistent = 1
-        OTHERS                  = 2.
-    IF sy-subrc <> 0.
-      RAISE EXCEPTION TYPE zcx_jum_log.
+    IF is_options-reopen = abap_true.
+      DATA: ls_filter  TYPE bal_s_lfil,
+            lt_headers TYPE balhdr_t.
+      CALL FUNCTION 'BAL_FILTER_CREATE'
+        EXPORTING
+          i_object       = iv_object
+          i_subobject    = iv_subobject
+          i_extnumber    = iv_extnumber
+          i_aluser       = sy-uname
+        IMPORTING
+          e_s_log_filter = ls_filter.
+
+      CALL FUNCTION 'BAL_DB_SEARCH'
+        EXPORTING
+          i_s_log_filter = ls_filter
+        IMPORTING
+          e_t_log_header = lt_headers
+        EXCEPTIONS
+          OTHERS         = 1.
+
+      IF sy-subrc = 0.
+        DATA(lv_lines) = lines( lt_headers ) - 1.
+        DELETE lt_headers TO lv_lines.
+
+        CALL FUNCTION 'BAL_DB_LOAD'
+          EXPORTING
+            i_t_log_header = lt_headers
+          EXCEPTIONS
+            OTHERS         = 1.
+        IF sy-subrc = 0.
+          mv_log_handle = lt_headers[ 1 ]-log_handle.
+        ENDIF.
+      ENDIF.
     ENDIF.
 
+    IF mv_log_handle IS INITIAL.
+      CALL FUNCTION 'BAL_LOG_CREATE'
+        EXPORTING
+          i_s_log                 = ls_ballog
+        IMPORTING
+          e_log_handle            = mv_log_handle
+        EXCEPTIONS
+          log_header_inconsistent = 1
+          OTHERS                  = 2.
+      IF sy-subrc <> 0.
+        RAISE EXCEPTION TYPE zcx_jum_log.
+      ENDIF.
+    ENDIF.
   ENDMETHOD.
 
 
@@ -278,6 +314,7 @@ CLASS ZCL_JUM_LOG IMPLEMENTATION.
     DATA: lt_bapiret TYPE bapiret2_tab.
 
     msg_convert_bopf_2_bapiret2( EXPORTING io_message  = io_message
+                                           iv_severity = iv_type
                                  CHANGING ct_bapiret2 = lt_bapiret ).
 
     zif_jum_log~add_bapirettab( iv_type       = iv_type

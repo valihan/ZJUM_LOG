@@ -1,63 +1,70 @@
-interface ZIF_JUM_LOG
-  public .
+INTERFACE zif_jum_log
+  PUBLIC .
 
 
-  types:
+  TYPES: BEGIN OF ts_message,
+           msgv1 TYPE syst_msgv,
+           msgv2 TYPE syst_msgv,
+           msgv3 TYPE syst_msgv,
+           msgv4 TYPE syst_msgv,
+         END OF ts_message.
+  TYPES:
     BEGIN OF ts_options,
-           auto_save TYPE boole_d,
-         END OF ts_options .
+      auto_save TYPE boole_d,
+      reopen    TYPE boole_d,
+    END OF ts_options .
 
-  methods SAVE
-    returning
-      value(RV_SUBRC) type SYST_SUBRC .
-  methods ADD_MESSAGE
-    importing
-      !IS_MESSAGE type BAL_S_MSG
-      !IV_TYPE type SYMSGTY default ZIF_JUM_LOG_CONST=>GC_S_MTYPE-INFO
-      !IV_PROBCLASS type BALPROBCL default ZIF_JUM_LOG_CONST=>GC_S_PROBCLASS-MEDIUM
-    returning
-      value(RV_SUBRC) type SYST_SUBRC .
-  methods ADD_BAPIRET2
-    importing
-      !IS_BAPIRET2 type BAPIRET2
-      !IV_TYPE type SYMSGTY default ZIF_JUM_LOG_CONST=>GC_S_MTYPE-INFO
-      !IV_PROBCLASS type BALPROBCL default ZIF_JUM_LOG_CONST=>GC_S_PROBCLASS-MEDIUM
-    returning
-      value(RV_SUBRC) type SYST_SUBRC .
-  methods ADD_EXCEPTION
-    importing
-      !IX_EXCEPTION type ref to CX_ROOT
-      !IV_TYPE type SYMSGTY default ZIF_JUM_LOG_CONST=>GC_S_MTYPE-ERROR
-      !IV_PROBCLASS type BALPROBCL default ZIF_JUM_LOG_CONST=>GC_S_PROBCLASS-MEDIUM
-    returning
-      value(RV_SUBRC) type SYST_SUBRC .
-  methods ADD_SYS
-    importing
-      !IV_TYPE type SYMSGTY default ZIF_JUM_LOG_CONST=>GC_S_MTYPE-INFO
-      !IV_PROBCLASS type BALPROBCL default ZIF_JUM_LOG_CONST=>GC_S_PROBCLASS-MEDIUM
-    returning
-      value(RV_SUBRC) type SYST_SUBRC .
-  methods ADD_BAPIRETTAB
-    importing
-      !IT_BAPIRETTAB type BAPIRETTAB
-      !IV_TYPE type SYMSGTY default ZIF_JUM_LOG_CONST=>GC_S_MTYPE-INFO
-      !IV_PROBCLASS type BALPROBCL default ZIF_JUM_LOG_CONST=>GC_S_PROBCLASS-MEDIUM
-    returning
-      value(RV_SUBRC) type SYST_SUBRC .
-  methods ADD_BOPF
-    importing
-      !IO_MESSAGE type ref to /BOBF/IF_FRW_MESSAGE
-      !IV_TYPE type SYMSGTY default ZIF_JUM_LOG_CONST=>GC_S_MTYPE-INFO
-      !IV_PROBCLASS type BALPROBCL default ZIF_JUM_LOG_CONST=>GC_S_PROBCLASS-MEDIUM
-    returning
-      value(RV_SUBRC) type SYST_SUBRC .
-  methods SHOW
-    importing
-      !IS_PROFILE type BAL_S_PROF optional .
-  methods IS_EMPTY
-    returning
-      value(RV_EMPTY) type BOOLE_D .
-  methods HAS_ERROR
-    returning
-      value(RV_HAS_ERROR) type BOOLE_D .
-endinterface.
+  METHODS save
+    RETURNING
+      VALUE(rv_subrc) TYPE syst_subrc .
+  METHODS add_message
+    IMPORTING
+      !is_message     TYPE bal_s_msg
+      !iv_type        TYPE symsgty DEFAULT zif_jum_log_const=>gc_s_mtype-info
+      !iv_probclass   TYPE balprobcl DEFAULT zif_jum_log_const=>gc_s_probclass-medium
+    RETURNING
+      VALUE(rv_subrc) TYPE syst_subrc .
+  METHODS add_bapiret2
+    IMPORTING
+      !is_bapiret2    TYPE bapiret2
+      !iv_type        TYPE symsgty DEFAULT zif_jum_log_const=>gc_s_mtype-info
+      !iv_probclass   TYPE balprobcl DEFAULT zif_jum_log_const=>gc_s_probclass-medium
+    RETURNING
+      VALUE(rv_subrc) TYPE syst_subrc .
+  METHODS add_exception
+    IMPORTING
+      !ix_exception   TYPE REF TO cx_root
+      !iv_type        TYPE symsgty DEFAULT zif_jum_log_const=>gc_s_mtype-error
+      !iv_probclass   TYPE balprobcl DEFAULT zif_jum_log_const=>gc_s_probclass-medium
+    RETURNING
+      VALUE(rv_subrc) TYPE syst_subrc .
+  METHODS add_sys
+    IMPORTING
+      !iv_type        TYPE symsgty DEFAULT zif_jum_log_const=>gc_s_mtype-info
+      !iv_probclass   TYPE balprobcl DEFAULT zif_jum_log_const=>gc_s_probclass-medium
+    RETURNING
+      VALUE(rv_subrc) TYPE syst_subrc .
+  METHODS add_bapirettab
+    IMPORTING
+      !it_bapirettab  TYPE bapirettab
+      !iv_type        TYPE symsgty DEFAULT zif_jum_log_const=>gc_s_mtype-info
+      !iv_probclass   TYPE balprobcl DEFAULT zif_jum_log_const=>gc_s_probclass-medium
+    RETURNING
+      VALUE(rv_subrc) TYPE syst_subrc .
+  METHODS add_bopf
+    IMPORTING
+      !io_message     TYPE REF TO /bobf/if_frw_message
+      !iv_type        TYPE symsgty DEFAULT zif_jum_log_const=>gc_s_mtype-info
+      !iv_probclass   TYPE balprobcl DEFAULT zif_jum_log_const=>gc_s_probclass-medium
+    RETURNING
+      VALUE(rv_subrc) TYPE syst_subrc .
+  METHODS show
+    IMPORTING
+      !is_profile TYPE bal_s_prof OPTIONAL .
+  METHODS is_empty
+    RETURNING
+      VALUE(rv_empty) TYPE boole_d .
+  METHODS has_error
+    RETURNING
+      VALUE(rv_has_error) TYPE boole_d .
+ENDINTERFACE.
