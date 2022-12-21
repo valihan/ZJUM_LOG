@@ -103,7 +103,9 @@ CLASS ZCL_JUM_LOG IMPLEMENTATION.
 
       IF sy-subrc = 0.
         DATA(lv_lines) = lines( lt_headers ) - 1.
-        DELETE lt_headers TO lv_lines.
+        IF lv_lines > 0.
+          DELETE lt_headers TO lv_lines.
+        ENDIF.
 
         CALL FUNCTION 'BAL_DB_LOAD'
           EXPORTING
@@ -271,7 +273,7 @@ CLASS ZCL_JUM_LOG IMPLEMENTATION.
 
   METHOD zif_jum_log~add_bapiret2.
     " Добавление сообщения в журнал приложения
-    zif_jum_log~add_message( is_message = VALUE #( msgty  = COND #( WHEN iv_type IS SUPPLIED THEN iv_type ELSE is_bapiret2-type )
+    zif_jum_log~add_message( is_message = VALUE #( msgty  = COND #( WHEN iv_type IS NOT INITIAL THEN iv_type ELSE is_bapiret2-type )
                                                    msgid  = is_bapiret2-id
                                                    msgno  = is_bapiret2-number
                                                    msgv1  = is_bapiret2-message_v1
@@ -352,7 +354,7 @@ CLASS ZCL_JUM_LOG IMPLEMENTATION.
     GET TIME STAMP FIELD ls_msg-time_stmp.
     ls_msg-probclass = iv_probclass.
 
-    IF iv_type IS SUPPLIED.
+    IF iv_type IS NOT INITIAL.
       ls_msg-msgty = iv_type.
     ENDIF.
 
